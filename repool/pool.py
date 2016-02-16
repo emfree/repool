@@ -16,7 +16,12 @@
 # along with Repool.  If not, see <http://www.gnu.org/licenses/>.
 
 import rethinkdb as r
-from queue import Queue
+try:
+    # Python 3
+    from queue import Queue
+except ImportError:
+    # Python 2
+    from Queue import Queue
 import time
 import logging
 from threading import Lock, Thread, Event
