@@ -70,11 +70,9 @@ class ConnectionPool(object):
 
         self._pool = Queue()
         self._pool_lock = Lock()
-        self._pool_lock.acquire()
         for i in range(0, self.pool_size):
-            self._pool.put(self.new_conn())
+            self._pool.put(None)
         self._current_acquired = 0
-        self._pool_lock.release()
 
         if self.cleanup_timeout > 0:
             self._thread_event = Event()
@@ -108,6 +106,8 @@ class ConnectionPool(object):
             conn_wrapper = self._pool.get_nowait()
         else:
             conn_wrapper = self._pool.get(True, timeout)
+        if conn_wrapper is None:
+            conn_wrapper = self.new_conn()
         self._current_acquired += 1
         self._pool_lock.release()
         return conn_wrapper.connection
